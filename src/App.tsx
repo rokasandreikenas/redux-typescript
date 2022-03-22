@@ -1,20 +1,22 @@
 import "./App.css";
 
-import { State, actionCreators } from "./state";
-import { useDispatch, useSelector } from "react-redux";
-
-import React from "react";
+import { actionCreators } from "./state";
 import { bindActionCreators } from "redux";
+import { useDispatch } from "react-redux";
+import { useState } from "react";
+import { useTypedSelector } from "./hooks/useTypeSelector";
 
 function App() {
   const dispatch = useDispatch();
+  const [postId, setPostId] = useState("");
 
-  const { depositMoney, withdrawMoney, bankrupt } = bindActionCreators(
-    actionCreators,
-    dispatch
+  const { depositMoney, withdrawMoney, bankrupt, getComments } =
+    bindActionCreators(actionCreators, dispatch);
+
+  const { amount, isLoading } = useTypedSelector((state) => state.bank);
+  const { comments, loading, error } = useTypedSelector(
+    (state) => state.comment
   );
-
-  const { amount, isLoading } = useSelector((state: State) => state.bank);
 
   return (
     <div className="App">
@@ -22,7 +24,17 @@ function App() {
       <button onClick={() => depositMoney(500)}>Deposit</button>
       <button onClick={() => withdrawMoney(500)}>Withdraw</button>
       <button onClick={() => bankrupt()}>Banrupt</button>
-      {isLoading && <h2>Loading...</h2>}
+      {(isLoading || loading) && <h2>Loading...</h2>}
+      {error && <h3>Error: {error}</h3>}
+      <br />
+      <br />
+      <input value={postId} onChange={(e) => setPostId(e.target.value)} />
+      <button onClick={() => getComments(postId)}>Search for Comments</button>
+      <ul>
+        {comments.map((comment) => (
+          <li key={comment.id}>{comment.body}</li>
+        ))}
+      </ul>
     </div>
   );
 }

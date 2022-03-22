@@ -1,5 +1,5 @@
 import { BankAction } from "../actions";
-import { BankActionType } from "../action-types";
+import { BankActionType } from "../actionTypes";
 
 interface BankState {
   amount: number;
